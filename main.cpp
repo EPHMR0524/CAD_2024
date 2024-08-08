@@ -87,7 +87,7 @@ int main(int argc,char *files[]){
         }
         
     }
-    for(int i=564;i<connection_matrix.size();i++){
+    for(int i=0;i<connection_matrix.size();i++){
         /*
         int ID;
         string TX;
@@ -660,7 +660,7 @@ int main(int argc,char *files[]){
         OASG_result.clear();
         Result_OARST.clear();//要加回來
        
-        if(i==564)break;
+        if(i==-1)break;
         //cout << "finish" <<connection_matrix[i].ID<< endl ;
         //cout << "======================" << endl;
     }
