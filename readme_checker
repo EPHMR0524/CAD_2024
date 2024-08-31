@@ -1,0 +1,4 @@
+run the checker need to have the same folder with cad_casexx 
+./run [caseXX] [caseXX.routing path]
+example:
+./run case00 /project/cad/cad05/d_MTK/Problem_D/case00.routing 

@@ -17,7 +17,7 @@ void rotate_block(vector<vector<float>> &vertex,const string direction,const flo
 void read_chip_top(vector<block_data> & block_placing,vector<region_area>& region_placing,float die_area[2][2],int&unit,int &block_num,int& region_num,string folder);
 void read_blk_area(const int num_of_block,vector<block_data> & block_placing,string folder);
 void read_cfg(vector<block_data> & block_placing,string cfg_file);
-void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_file);
+void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_file,int &max_num);
 void convert_block_data(const int unit,vector<block_data>&block_placing );
 
 bool compareByY(const vector<float>& a, const vector<float>& b) ;

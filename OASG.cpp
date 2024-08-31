@@ -330,26 +330,34 @@ void regionOASG()
         //}
     }
 }
-bool judge_inside_obstacle(poi p1,poi p2, vector<vector<float>>C_data,vector<partitioned_block> obstacles,vector<block_data>non_through_block)
+bool judge_inside_obstacle(poi p1,poi p2, vector<vector<float>>&C_data,vector<partitioned_block>& obstacles,vector<block_data>&non_through_block)
 {   
-    // cout<<"ob_vertex: "<<endl;
+     //cout<<"ob_vertex: "<<endl;
     // for(int i=0;i<C_data.size();i++){
     //     cout<<C_data[i][0]<<" "<<C_data[i][1]<<endl;
     // }
     //cout<<"node:  "<<node;
+    //cout<<obstacles.size()<<" "<<(p1.id-node)/4<<" "<<(p2.id-node)/4<<endl;
+    if((p1.id-node-1)/4>=obstacles.size() || (p2.id-node-1)/4>= obstacles.size())
+      cout<<obstacles.size()<<" "<<(p1.id-node)<<" "<<p2.id-node<<endl;
     if(p1.id<=node || p2.id<=node){
-        //cout<<"1 "<<size<<endl;
+        //cout<<"p1.id<=node || p2.id<=node "<<endl;
         return false;
     } 
+    //else if((p1.id-node)/4>=obstacles.size() || (p2.id-node)/4>= obstacles.size()){
+        
+      //  cout<<p1.id<<" "<<p2.id<<endl;
+        //return false;
+    //}
     //not same obstacle
-    else if(obstacles[(p1.id-node)/4].blk_name!=obstacles[(p2.id-node)/4].blk_name){//可能改
+    else if(obstacles[(p1.id-node-1)/4].blk_name!=obstacles[(p2.id-node-1)/4].blk_name){//可能改
         //cout<<"2 "<<size<<endl;
-
+        //cout<<"obstacles[(p1.id-node)/4].blk_name!=obstacles[(p2.id-node)/4].blk_name "<<endl;
         return false;
     } 
     else
-    { 
-        string blk_name=obstacles[(p1.id-node)/4].blk_name;
+    {   //cout<<"else "<<endl;
+        string blk_name=obstacles[(p1.id-node-1)/4].blk_name;
         //cout<<"blk_datas "<<(p1.id-node)/4<<" "<<blk_name<<endl;
         int kkk=0;
         for(int i=0;i<non_through_block.size();i++){
@@ -396,6 +404,7 @@ bool judge_inside_obstacle(poi p1,poi p2, vector<vector<float>>C_data,vector<par
         //cout<<4<<endl;
         return true;
     }
+    return false;
 }
 void OASG()
 {   //cout<<"OASG"<<endl;
@@ -471,7 +480,13 @@ void OASG()
     //cout<<"before regionOASG 4"<<endl;
     regionOASG();
 }
-unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<float>> node_list, vector<block_data>non_through_block)
+bool is_close(float a,float b){
+    if(abs(a-b)<=0.0001)
+        return true;
+    else
+        return false;
+}
+unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<float>> &node_list, vector<block_data>&non_through_block,float boarder_x,float boarder_y)
 {   //cout<<"generate_OASG"<<endl;
     //外面要建好:node_list、non_through_block、
     vector<partitioned_block> obstacles;
@@ -495,7 +510,7 @@ unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<f
         for(int j=0;j<non_through_block[i].vertex.size()/2;j++){
             //obstacle_pts.push_back(non_through_block[i].vertex[2*j+0]);
             //obstacle_pts.push_back(non_through_block[i].vertex[2*j+1]);
-            partitioned_block temp;
+            partitioned_block temp;  
             temp.pt1.x=non_through_block[i].vertex[2*j+0][0];
             temp.pt1.y=non_through_block[i].vertex[2*j+0][1];
             temp.pt2.x=non_through_block[i].vertex[2*j+1][0];
@@ -571,7 +586,7 @@ unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<f
     init_map();
     //cout << "hahahahahah!!!" << endl;
     OASG();
-    //cout << "hello!!!" << endl;
+    cout << "hello!!!" <<numOASGedge<< endl;
     
     //cout<<"start point and end point and cost:"<<endl;
     //cout<<"numOASGedge:"<<numOASGedge<<endl;
@@ -590,118 +605,33 @@ unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<f
         temp.pt2.push_back(p2.x);
         temp.pt2.push_back(p2.y);
         temp.cost=cost;
-
         vector<vector<float>>C_data;
-        // int counter=0;
-        // int pt1_test=0,pt2_test=0;
-        // int index_1=is_in_vector(grids_pts,{p1.x,p1.y})-1,index_2=is_in_vector(grids_pts,{p2.x,p2.y})-1;
-        // for(int j=0;j<grids_pt_num.size();j++){
-        //     counter+=grids_pt_num[j];
-        //     if(index_1+1>counter)pt1_test+=1;
-        //     if(index_2+1>counter)pt2_test+=1;
-        // }
-        // //cout<<pt1_test<<" "<<non_through_block.size()<<endl;
-        // if(pt1_test==pt2_test)C_data=non_through_block[pt1_test].original_vertex;
-        // else C_data={};
-        
-        if((judge_inside_obstacle(p1,p2,C_data,obstacles,non_through_block)==0)){
+        bool is_on_boarder=0;
+        //cout<<i<<endl;
+        //is_on_boarder=(p1.x<=0 || p1.y<=0 || p1.x>=boarder_x || p1.y>=boarder_y|| p2.x<=0 || p2.y<=0 || p2.x>=boarder_x || p2.y>=boarder_y);
+        //cout<<1<<endl;
+        //cout<<"before judge"<<endl;
+        if(!(judge_inside_obstacle(p1,p2,C_data,obstacles,non_through_block)) && !is_on_boarder){
+            //cout <<i<<" "<<  p1.x << " " << p1.y << " " << p2.x << " " << p2.y << endl;
+            //cout<<2<<endl;
             result.push_back(temp);
+            //cout<<3<<endl;
             addEdge(adj_lists,{p1.x,p1.y},{p2.x,p2.y});
+            //cout<<4<<endl;
+            //cout<<"yesyesyes"<<endl;
         }
-            
+        //cout<<5<<endl;
+        temp.pt1.clear();
+        //cout<<6<<endl;
+        temp.pt2.clear();
+        //cout<<7<<endl;
         //cout<<"kk2"<<endl;
         C_data.clear();
+        //cout<<8<<endl;
         //else continue;
-        //cout <<  p1.x << " " << p1.y << " " << p2.x << " " << p2.y << endl;
+        
     }
-    // vector<result_edge> real_result;
-    // for(int i=0;i<result.size();i++){
-    //     //int temp2=i;
-    //     //cout<<result[i].pt1[0]<<" "<<result[i].pt1[1]<<" "<<result[i].pt2[0]<<" "<<result[i].pt2[1]<<" "<<result[i].cost<<endl;
-    //     int is_pin=0;
-    //     for(int j=0;j<p_inital.size();j++){
-    //         if((p_inital[j+1].x==result[i].pt1[0] && p_inital[j+1].y==result[i].pt1[1]) ){
-    //             is_pin+=1;
-    //         }
-    //         if( (p_inital[j+1].x==result[i].pt2[0] && p_inital[j+1].y==result[i].pt2[1])){
-    //             is_pin+=2;
-    //         }
-    //     }
-    //     if(is_pin!=0){
-    //         if(is_pin==3){
-    //             real_result.push_back(result[i]);
-    //             addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //         }
-    //         else if(is_pin==1){
-    //             int check=is_in_vector(grids_pts,result[i].pt2);
-    //             if(check==0){
-    //                 continue;
-    //             }
-    //             else{
-    //                 real_result.push_back(result[i]);
-    //                 addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //             }
-    //         }   
-    //         else if(is_pin==2){
-    //             int check=is_in_vector(grids_pts,result[i].pt1);
-    //             if(check==0){
-    //                 continue;
-    //             }
-    //             else{
-    //                 real_result.push_back(result[i]);
-    //                 addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //             }
-    //         }
-    //     }
-    //     else if((!is_in_vector(grids_pts,result[i].pt1) && !is_in_vector(grids_pts,result[i].pt2))){
-    //         continue;
-    //     }
-    //     else{
-    //         if((is_in_vector(block_obstacle_pts,result[i].pt1) && is_in_vector(block_obstacle_pts,result[i].pt2))){
-    //             //continue;
-    //             real_result.push_back(result[i]);
-    //             addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //         }
-    //         else if((is_in_vector(grids_pts,result[i].pt1) && is_in_vector(grids_pts,result[i].pt2))){
-    //             int counter=0;
-    //             int pt1_test=0,pt2_test=0;
-    //             int index_1=is_in_vector(grids_pts,result[i].pt1),index_2=is_in_vector(grids_pts,result[i].pt2);
-    //             for(int j=0;j<grids_pt_num.size();j++){
-    //                 counter+=grids_pt_num[j];
-    //                 if(index_1+1>counter)pt1_test+=1;
-    //                 if(index_2+1>counter)pt2_test+=1;
-    //             }
-    //             if(pt1_test==pt2_test){
-    //                 if(abs(index_1-index_2)==1){
-    //                     real_result.push_back(result[i]);
-    //                     addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //                 }
-    //                 else if(result[i].pt1[0]==result[i].pt2[0] || result[i].pt1[1]==result[i].pt2[1]){
-    //                     real_result.push_back(result[i]);
-    //                     addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //                 }
-    //             }
-    //             continue;
-    //         }
-            
-    //         else{
-    //             //continue;
-    //             real_result.push_back(result[i]);
-    //             addEdge(adj_lists,{result[i].pt1[0],result[i].pt1[1]},{result[i].pt2[0],result[i].pt2[1]});
-    //         }
-    //     }
-        
-            
-        
-        
-    // }
-    // cout<<"numOASGedge:"<<real_result.size()<<endl;
-    
-   ofstream outFile("_net.rpt");
-     for (int i=0;i<result.size();i++)
-     {
-          outFile<<result[i].pt1[0]<<" "<<result[i].pt1[1]<<" "<<" "<<" "<<result[i].pt2[0]<<" "<<result[i].pt2[1]<<" "<<endl;
-     }
+    cout<<"end judging"<<endl;
     cout<<"finishOASG";
     //obstacle_pts.clear();////should try improve the traver version
     obstacles_pt_num.clear();////should try improve the traver version
@@ -711,6 +641,7 @@ unordered_map <vertex,unordered_map<vertex, float>>generate_OASG(vector<vector<f
     A_data.clear();
     B_data.clear();
     OASGedge.clear();
+    obstacles.clear();
     p_inital.clear();
     block_obstacle_pts.clear();
     obs_inital.clear();

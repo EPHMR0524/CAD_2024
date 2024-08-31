@@ -21,6 +21,7 @@ void init(int n,int m);
 bool collison_block(poi a,poi b);
 void regionOASG();
 void OASG();
-bool judge_inside_obstacle(poi p1,poi p2, vector<vector<float>>C_data,vector<partitioned_block> obstacles,vector<block_data>non_through_block);
-unordered_map <vertex,unordered_map<vertex, float>> generate_OASG(vector<vector<float>>node_list, vector<block_data>non_through_block);
+bool judge_inside_obstacle(poi p1,poi p2, vector<vector<float>>&C_data,vector<partitioned_block> &obstacles,vector<block_data>&non_through_block);
+bool is_close(float a,float b);
+unordered_map <vertex,unordered_map<vertex, float>> generate_OASG(vector<vector<float>>&node_list, vector<block_data>&non_through_block,float boarder_x,float boarder_y);
 #endif

@@ -243,11 +243,17 @@ void read_cfg(vector<block_data> & block_placing,string cfg_file){
         else if(result[0]=="    \"block_port_region\""){
             result[1]=delete_symbol(result[1]);
             vector<string> numbers=eliminate_space(result[1]);//object to store all elements of a line
-            for(int i=0;i<numbers.size()/2;i++){
+            for(int i=0;i<numbers.size()/4;i++){
                 vector<float> region_tuple;
-                region_tuple.push_back(stof(numbers[i*2+0]));
-                region_tuple.push_back(stof(numbers[i*2+1]));
+                region_tuple.push_back(stof(numbers[i*4+0]));
+                region_tuple.push_back(stof(numbers[i*4+1]));
+                region_tuple.push_back(stof(numbers[i*4+2]));
+                region_tuple.push_back(stof(numbers[i*4+3]));
                 block_placing[index].block_port_region.push_back(region_tuple);
+                // cout << "block_port_region_0 : " <<block_placing[index].block_port_region[i][0] << endl;
+                // cout << "block_port_region_1 : " <<block_placing[index].block_port_region[i][1] << endl;
+                // cout << "block_port_region_2 : " <<block_placing[index].block_port_region[i][2] << endl;
+                // cout << "block_port_region_3 : " <<block_placing[index].block_port_region[i][3] << endl;
                 region_tuple.clear();
             }
         }
@@ -278,7 +284,8 @@ void read_cfg(vector<block_data> & block_placing,string cfg_file){
     file.close();
 }
 
-void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_file){
+void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_file,int &max_num){
+    max_num=0;
     ifstream file;
     string file_place=connectin_file;
     file.open(file_place);
@@ -311,6 +318,9 @@ void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_f
         else if(result[0]=="    \"NUM\""){
            result[1]=delete_symbol(result[1]);
            temp_net.NUM=stoi(result[1]);
+           if(temp_net.NUM>=max_num){
+               max_num=temp_net.NUM;
+           }
            //cout<<temp_net.NUM<<",";
         }
         else if(result[0]=="    \"MUST_THROUGH\""){
@@ -407,16 +417,16 @@ void parse_connection_matrix(vector<NETS> &connection_matrix ,string connectin_f
 
 }
 void convert_block_data(const int unit,vector<block_data>&block_placing ){
-
+    
     for (int i=0;i<block_placing.size();i++){
-        block_placing[i].place[0];//deal with the conversion of place
-        block_placing[i].place[1];
+        block_placing[i].place[0]/=1;//deal with the conversion of place
+        block_placing[i].place[1]/=1;
         //cout<<block_placing[i].place[0]<<" "<<block_placing[i].place[1]<<endl;/=unit
         //cout<<block_placing[i].blk_name<<" ";
         for(int j=0;j<block_placing[i].vertex.size();j++){//deal with the conversion of vertex of block
             //cout<<block_placing[i].vertex[j][0]<<" "<<block_placing[i].vertex[j][1]<<" ";
-            block_placing[i].vertex[j][0];
-            block_placing[i].vertex[j][1];
+            block_placing[i].vertex[j][0]/=1;
+            block_placing[i].vertex[j][1]/=1;
             
         }
         //cout<<endl;
@@ -428,8 +438,10 @@ void convert_block_data(const int unit,vector<block_data>&block_placing ){
             block_placing[i].through_block_edge_net_num_lst[j].start_and_end[1][1]+=block_placing[i].place[1];
         }
         for(int j=0;j<block_placing[i].block_port_region.size();j++){
-            block_placing[i].block_port_region[j][0]+=block_placing[i].place[0];
-            block_placing[i].block_port_region[j][1]+=block_placing[i].place[1];
+            block_placing[i].block_port_region[j][0]+=(block_placing[i].place[0]/unit);
+            block_placing[i].block_port_region[j][1]+=(block_placing[i].place[1]/unit);
+            block_placing[i].block_port_region[j][2]+=(block_placing[i].place[0]/unit);
+            block_placing[i].block_port_region[j][3]+=(block_placing[i].place[1]/unit);
         }
         rotate_block(block_placing[i].original_vertex,block_placing[i].direction,block_placing[i].place[0],block_placing[i].place[1]);
         
@@ -552,7 +564,7 @@ vector<vector<float>> build_grid_list(vector<vector<float>> rectangle){
 
 }
 void sort_the_vertex(vector<vector<float>> &rectangle){
-    float x_leftmost=100000000000,y_downmost=1000000000000;
+    float x_leftmost=10000000,y_downmost=100000000;
     vector<vector<float>> result;
     for(int i=0;i<(int)rectangle.size();i++){
         if(rectangle[i][0]<x_leftmost){
@@ -696,8 +708,15 @@ void change_unit(vector<block_data> & block_placing,int unit){
 
         }*/
         for(int j=0;j<block_placing[i].block_port_region.size();j++){
-            block_placing[i].block_port_region[j][0]/=unit;
-            block_placing[i].block_port_region[j][1]/=unit;
+            // cout << "block_port_region_before: " << block_placing[i].block_port_region[j][0] << endl;
+            // block_placing[i].block_port_region[j][0]/=unit;
+            // block_placing[i].block_port_region[j][1]/=unit;
+            // block_placing[i].block_port_region[j][2]/=unit;
+            // block_placing[i].block_port_region[j][3]/=unit;
+            // cout << "block_port_region_after_0 : " << block_placing[i].block_port_region[j][0] << endl;
+            // cout << "block_port_region_after_1 : " << block_placing[i].block_port_region[j][1] << endl;
+            // cout << "block_port_region_after_2 : " << block_placing[i].block_port_region[j][2] << endl;
+            // cout << "block_port_region_after_3 : " << block_placing[i].block_port_region[j][3] << endl;
         }
         for(int j=0;j<block_placing[i].original_vertex.size();j++){
             block_placing[i].original_vertex[j][0]/=unit;

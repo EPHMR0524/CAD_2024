@@ -896,19 +896,19 @@ vector<pair<vertex, vertex>> generate_OARST(unordered_map <vertex, unordered_map
     
     //test case input end
     cout<<"before while"<<endl;
-    ofstream outFile("_OARST.rpt");
+    //ofstream outFile("_OARST.rpt");
     
     int counter=0;
     while(is_there_slant(MST) && MST.size()!=1 ){
         counter+=1;//counter<=20
-        outFile<<"in while "<<counter<<endl;
+        //outFile<<"in while "<<counter<<endl;
         //  for (int i=0;i<MST.size();i++)
         // {
         //     outFile<<real_result[i].pt1[0]<<" "<<real_result[i].pt1[1]<<" "<<" "<<" "<<real_result[i].pt2[0]<<" "<<real_result[i].pt2[1]<<" "<<endl;
         // }
-        for(int i=0;i<MST.size();i++){
-            outFile<<MST[i].first.x<<" "<<MST[i].first.y<<" "<<MST[i].second.x<<" "<<MST[i].second.y<<" "<<endl;
-        }
+        //for(int i=0;i<MST.size();i++){
+            //outFile<<MST[i].first.x<<" "<<MST[i].first.y<<" "<<MST[i].second.x<<" "<<MST[i].second.y<<" "<<endl;
+        //}
         int E1_index=find_longest_slant_edge(MST);
         //cout<<"int while 2"<<endl;
         unordered_map <vertex, unordered_map<vertex, float>> MST_adj_list=build_adj_lists(MST);
@@ -922,8 +922,8 @@ vector<pair<vertex, vertex>> generate_OARST(unordered_map <vertex, unordered_map
         
         pair<vertex, vertex> E2=neighbors[E2_index];
 
-        outFile<<"E1、E2: "<<E1.first.x<<" "<<E1.first.y<<" "<<E1.second.x<<" "<<E1.second.y<<" "<<endl;
-        outFile<<E2.first.x<<" "<<E2.first.y<<" "<<E2.second.x<<" "<<E2.second.y<<" "<<endl;
+        //outFile<<"E1、E2: "<<E1.first.x<<" "<<E1.first.y<<" "<<E1.second.x<<" "<<E1.second.y<<" "<<endl;
+        //outFile<<E2.first.x<<" "<<E2.first.y<<" "<<E2.second.x<<" "<<E2.second.y<<" "<<endl;
         
         //cout<<"int while 6"<<endl;
         partition_edge(MST,E1,E2);
